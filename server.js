@@ -4,6 +4,7 @@ var express = require('express'),
   cors = require('cors'),
   docs = require("express-mongoose-docs");
 // create instance of express
+
 var app = express();
 app.use(cors());
 app.options('*', cors())
@@ -20,7 +21,7 @@ var routesProducts = require('./routes/products-routes.js');
 // // define middleware
 app.use("/api/products", routesProducts);
 
-const port =  3000;
+const port = process.env.PORT || 3000;
 app.listen(port);
 console.log(`Listening on :${port}`);
 module.exports = {app};
