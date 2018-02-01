@@ -12,65 +12,55 @@ const getExchangeRate = (to) => {
 module.exports = {
     one: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.findById(productID).then((product) => {
-                if (!product) {
-                    return res.status(404).send();
-                }
-                res.send({ product });
-            }).catch((e) => {
-                res.status(400).send();
-            });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+        Product.findById(productID).then((product) => {
+            if (!product) {
+                return res.status(404).send();
+            }
+            res.send({ product });
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server."
             });
-        }
+        });
     },
     all: (req, res) => {
-        try {
-            Product.find().then((products) => {
-                res.send({ products });
-            }, (e) => {
-                res.status(400).send(e);
-            })
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+        Product.find().then((products) => {
+            res.send({ products });
+        }, (e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server"
             });
-        }
+        })
     },
     update: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.findByIdAndUpdate(productID, req.body, { new: true }).then((prod) => {
-                if (!prod) {
-                    return res.status(404).send();
-                }
-                res.send({ prod });
-            }).catch((e) => {
-                res.status(400).send();
-            })
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+        Product.findByIdAndUpdate(productID, req.body, { new: true }).then((prod) => {
+            if (!prod) {
+                return res.status(404).send();
+            }
+            res.send({ prod });
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server"
             });
-        }
+
+        })
+
     },
     save: (req, res) => {
         var newProduct = new Product({
@@ -99,127 +89,111 @@ module.exports = {
     },
     delete: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.findByIdAndRemove(productID).then((prod) => {
-                if (!prod) {
-                    return res.status(404).send();
-                }
-                res.status(200).send({ prod });
-            }).catch((e) => {
-                res.status(400).send();
-            });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+        Product.findByIdAndRemove(productID).then((prod) => {
+            if (!prod) {
+                return res.status(404).send();
+            }
+            res.status(200).send({ prod });
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
-                message: "An error ocurred while trying to upload the profile picture."
+                message: "An error ocurred on the server"
             });
-        }
+        });
     },
     cost: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.findById(productID).then((product) => {
-                if (!product) {
-                    return res.status(404).send();
-                }
-                var costs = product.cost * product.stock;
-                res.send(JSON.stringify({ "Cost": costs }));
-            }).catch((e) => {
-                res.status(400).send();
-            });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+        Product.findById(productID).then((product) => {
+            if (!product) {
+                return res.status(404).send();
+            }
+            var costs = product.cost * product.stock;
+            res.send(JSON.stringify({ "Cost": costs }));
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server."
             });
-        }
+        });
     },
     earnings: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.findById(productID).then((product) => {
-                if (!product) {
-                    return res.status(404).send();
-                }
-                var cost = product.cost * product.stock;
-                var earnings = product.price * product.stock;
-                var total = earnings - cost;
-                res.send(JSON.stringify({ "Earnings": earnings - cost }));
-            }).catch((e) => {
-                res.status(400).send();
-            });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+
+        Product.findById(productID).then((product) => {
+            if (!product) {
+                return res.status(404).send();
+            }
+            var cost = product.cost * product.stock;
+            var earnings = product.price * product.stock;
+            var total = earnings - cost;
+            res.send(JSON.stringify({ "Earnings": earnings - cost }));
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server."
             });
-        }
+        });
     },
     totalcost: (req, res) => {
-        try {
-            Product.find().then((products) => {
-                if (!products) {
-                    return res.status(404).send();
-                }
-                var totalCost = 0
-                products.forEach(function (prod) {
-                    totalCost += prod.cost * prod.stock
-                });
-                res.send(JSON.stringify({ "Total Costs": totalCost }));
-            }).catch((e) => {
-                res.status(400).send();
+        Product.find().then((products) => {
+            if (!products) {
+                return res.status(404).send();
+            }
+            var totalCost = 0
+            products.forEach(function (prod) {
+                totalCost += prod.cost * prod.stock
             });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+            res.send(JSON.stringify({ "Total Costs": totalCost }));
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server."
             });
-        }
+        });
+
+
+
     },
     totalearnings: (req, res) => {
         const productID = req.params.id;
-        try {
-            Product.find().then((products) => {
-                if (!products) {
-                    return res.status(404).send();
-                }
-                var totalEarnings = 0;
-                products.forEach(function (product) {
-                    var cost = product.cost * product.stock;
-                    var earnings = product.price * product.stock;
-                    var total = earnings - cost;
-                    totalEarnings += total;
-                });
-                res.send(JSON.stringify({ "Total Earnings": totalEarnings }));
-            }).catch((e) => {
-                res.status(400).send();
+        Product.find().then((products) => {
+            if (!products) {
+                return res.status(404).send();
+            }
+            var totalEarnings = 0;
+            products.forEach(function (product) {
+                var cost = product.cost * product.stock;
+                var earnings = product.price * product.stock;
+                var total = earnings - cost;
+                totalEarnings += total;
             });
-        } catch (ex) {
-            if (ex.errorCode) {
-                return res.status(ex.errorCode).json({
-                    message: ex.message
+            res.send(JSON.stringify({ "Total Earnings": totalEarnings }));
+        }).catch((e) => {
+            if (e.errorCode) {
+                return res.status(e.errorCode).json({
+                    message: e.message
                 });
             }
             return res.status(500).json({
                 message: "An error ocurred on the server."
             });
-        }
+        });
     },
     convertcurrency: async (req, res) => {
         var ctrl = require("../controllers/products-controller");
